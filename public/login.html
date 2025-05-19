@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Salão de Beleza</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .login-container {
+      max-width: 400px;
+      margin: 0 auto;
+      margin-top: 100px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo img {
+      max-width: 150px;
+    }
+    .cadastro-container {
+      display: none;
+    }
+    .form-switch,
+    .forgot-password {
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-container" id="loginContainer">
+      <div class="logo">
+        <h2>Salão de Beleza</h2>
+      </div>
+      
+      <form id="loginForm">
+        <div class="mb-3">
+          <label for="username" class="form-label">Usuário</label>
+          <input type="text" class="form-control" id="username" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Senha</label>
+          <div class="input-group">
+            <input type="password" class="form-control password-input" id="password" required>
+            <button class="btn btn-outline-secondary toggle-password" type="button">
+              <i class="bi bi-eye-slash-fill"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        
+        <div class="forgot-password">
+          <p>Esqueceu a senha?<a href="#" id="forgotPasswordLink"> Clique aqui</a></p>
+        </div>
+      </form>
+      
+      <div id="loginMessage" class="mt-3 alert alert-danger d-none"></div>
+      
+      <div class="form-switch">
+        Ainda não tem conta? <a href="#" id="switchToCadastro">Cadastre agora</a>
+      </div>
+    </div>
+
+       <!-- Modal para recuperação de senha -->
+       <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Recuperar Senha</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="forgotPasswordForm">
+                <div class="mb-3">
+                  <label for="recoveryEmail" class="form-label">Digite seu email cadastrado</label>
+                  <input type="email" class="form-control" id="recoveryEmail" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Enviar nova senha</button>
+              </form>
+              <div id="recoveryMessage" class="mt-3 alert d-none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="login-container cadastro-container" id="cadastroContainer">
+      <div class="logo">
+        <h2>Criar nova conta</h2>
+      </div>
+      
+      <form id="cadastroForm">
+        <div class="mb-3">
+          <label for="cadastroUsername" class="form-label">Usuário</label>
+          <input type="text" class="form-control" id="cadastroUsername" required>
+        </div>
+        <div class="mb-3">
+          <label for="cadastroEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="cadastroEmail" required>
+        </div>
+        <div class="mb-3">
+          <label for="cadastroAniversario" class="form-label">Data de nascimento</label>
+          <input type="date" class="form-control" id="cadastroAniversario" required>
+        </div>
+        <div class="mb-3">
+          <label for="cadastroPassword" class="form-label">Senha</label>
+          <div class="input-group">
+            <input type="password" class="form-control password-input" id="cadastroPassword" required>
+            <button class="btn btn-outline-secondary toggle-password" type="button">
+              <i class="bi bi-eye-slash-fill"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirmar Senha</label>
+          <div class="input-group">
+            <input type="password" class="form-control password-input" id="confirmPassword" required>
+            <button class="btn btn-outline-secondary toggle-password" type="button">
+              <i class="bi bi-eye-slash-fill"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success w-100">Cadastrar</button>
+      </form>
+      
+      <div id="cadastroMessage" class="mt-3 alert d-none"></div>
+      
+      <div class="form-switch">
+        Já tem uma conta? <a href="#" id="switchToLogin">Faça login</a>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LfpTyorAAAAAD2GVfVkJPMKYhTsPfWlPGWCTC90"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

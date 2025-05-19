@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamento - Salão de Beleza</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- CSS do Choices.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+  <!-- JS do Choices.js -->
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div class="container py-5">
+    <h1 class="text-center mb-5">Agende seu horário</h1>
+    
+    <div class="card">
+      <div class="card-header">
+        <ul class="nav nav-pills card-header-pills justify-content-center">
+          <li class="nav-item"><a class="nav-link step-indicator active" data-step="1">Categoria</a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" data-step="2">Serviço</a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" data-step="3">Profissional</a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" data-step="4">Data</a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" data-step="5">Horário</a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" data-step="6">Cupom</a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" data-step="7">Confirmar</a></li>
+        </ul>
+      </div>
+      
+      <div class="card-body">
+        <form id="appointmentForm">
+          <!-- Passo 1: Selecionar Categoria  -->
+          <div class="step active" id="step1">
+            <h3>Selecione a categoria</h3>
+            <div class="mb-3">
+              <label for="category" class="form-label">Categoria</label>
+              <select class="form-select" id="category" required>
+                <option value="" selected disabled>Selecione uma categoria</option>
+              </select>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary" disabled>Voltar</button>
+              <button type="button" class="btn btn-primary next-step" data-next="2">Próximo</button>
+            </div>
+          </div>
+          
+          <!-- Passo 2: Selecionar Serviço -->
+          <div class="step" id="step2">
+            <h3>Selecione o serviço</h3>
+            <div class="mb-3">
+              <label for="service" class="form-label">Serviço</label>
+              <select class="form-select" id="service" required>
+                <option value="" selected disabled>Selecione um serviço</option>
+              </select>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="1">Voltar</button>
+              <button type="button" class="btn btn-primary next-step" data-next="3">Próximo</button>
+            </div>
+          </div>
+          
+          <!-- Passo 3: Selecionar Profissional -->
+          <div class="step" id="step3">
+            <h3>Selecione o profissional</h3>
+            <div class="mb-3">
+              <label for="employee" class="form-label">Profissional</label>
+              <select class="form-select" id="employee" required>
+                <option value="" selected disabled>Selecione um profissional</option>
+              </select>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="2">Voltar</button>
+              <button type="button" class="btn btn-primary next-step" data-next="4">Próximo</button>
+            </div>
+          </div>
+          
+          <!-- Passo 4: Selecionar Data -->
+          <div class="step" id="step4">
+            <h3>Selecione a data</h3>
+            <div class="mb-3">
+              <label for="appointmentDate" class="form-label">Data</label>
+              <input type="text" class="form-control" id="appointmentDate" required>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="3">Voltar</button>
+              <button type="button" class="btn btn-primary next-step" data-next="5">Próximo</button>
+            </div>
+          </div>
+          
+         <!-- Passo 5: Selecionar Horário -->
+          <div class="step" id="step5">
+            <h3>Selecione o horário</h3>
+            <div class="mb-3">
+              <label class="form-label">Horários disponíveis</label>
+              <div id="timeSlots" class="d-flex flex-wrap gap-2"></div>
+            </div>
+            <input type="hidden" id="selectedTime" required>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="4">Voltar</button>
+              <button type="button" class="btn btn-primary next-step" data-next="6">Próximo</button>
+            </div>
+          </div>
+
+          <!-- Passo 6: Adicionar Cupom -->
+          <div class="step" id="step6">
+            <h3>Adicionar cupom de desconto</h3>
+            <div class="mb-3">
+              <label for="couponCode" class="form-label">Código do Cupom (opcional)</label>
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" id="couponCode" placeholder="Digite seu cupom">
+                <button class="btn btn-outline-primary" type="button" id="applyCoupon">Aplicar</button>
+              </div>
+              <div id="couponMessage" class="text-small"></div>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="5">Voltar</button>
+              <button type="button" class="btn btn-primary next-step" data-next="7">Próximo</button>
+            </div>
+          </div>
+
+            
+           <!-- Passo 7: Confirmação -->
+          <div class="step" id="step7">
+            <h3>Confirme seu agendamento</h3>
+            <div class="mb-3">
+              <label for="clientName" class="form-label">Nome completo</label>
+              <input type="text" class="form-control" id="clientName" required>
+            </div>
+            <div class="mb-3">
+              <label for="clientEmail" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="clientEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="clientPhone" class="form-label">Telefone</label>
+              <input type="tel" class="form-control" id="clientPhone" required>
+            </div>
+            
+            <div class="card mb-4">
+              <div class="card-header">Detalhes do Agendamento</div>
+              <div class="card-body">
+                <p><strong>Serviço:</strong> <span id="confirmService"></span></p>
+                <p><strong>Profissional:</strong> <span id="confirmEmployee"></span></p>
+                <p><strong>Data:</strong> <span id="confirmDate"></span></p>
+                <p><strong>Horário:</strong> <span id="confirmTime"></span></p>
+                <p><strong>Preço:</strong> <span id="confirmPrice"></span></p>
+                <p id="couponConfirmation" class="text-success"></p>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="6">Voltar</button>
+              <button type="submit" class="btn btn-success">Confirmar Agendamento</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agendamento Confirmado!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Seu agendamento foi confirmado com sucesso!</p>
+          <p>Detalhes:</p>
+          <ul id="appointmentDetails"></ul>
+          <p>Selecione a forma que deseja receber a confirmação de agendamento.</p>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <div class="btn-group">
+            <button type="button" class="btn btn-success" id="whatsappBtn">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </button>
+            <button type="button" class="btn btn-danger" id="emailBtn">
+              <i class="bi bi-envelope"></i> Email
+            </button>
+            <!-- <button type="button" class="btn btn-danger" id="pdfBtn">
+              <i class="bi bi-file-earmark-pdf"></i> PDF
+            </button> -->
+            <button type="button" class="btn btn-primary text-white" id="calendarBtn">
+              <i class="bi bi-calendar-event"></i> Calendário
+            </button>
+          </div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Modal de Sucesso -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Sucesso!</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Mensagem enviada com sucesso via WhatsApp!</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Erro -->
+  <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Erro</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="errorMessage">Falha ao enviar. Tente novamente.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Validação -->
+  <div class="modal fade" id="validationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title">Atenção</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="validationMessage">Número inválido. Digite um número com DDD.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Loading -->
+  <div class="modal fade" id="emailLoadingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Enviando e-mail...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Sucesso no E-mail -->
+  <div class="modal fade" id="emailSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Sucesso!</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>E-mail de confirmação enviado com sucesso!</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Erro no E-mail -->
+  <div class="modal fade" id="emailErrorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Erro no Envio</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="emailErrorMessage">Erro ao enviar e-mail de confirmação</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+  <script src="js/index.js"></script>
+  <script src="js/cupom.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<script src="https://cdn.auth0.com/js/auth0/9.19/auth0.min.js"></script>
+<script>
+  const auth0 = new auth0.WebAuth({
+    domain: 'SEU-DOMINIO.auth0.com',
+    clientID: 'SEU_CLIENT_ID',
+    redirectUri: 'http://localhost:3000/callback',
+    responseType: 'token id_token',
+    scope: 'openid profile email'
+  });
+
+  function loginComGoogle() {
+    auth0.authorize({
+      connection: 'google-oauth2'
+    });
+  }
+</script>
+
+<button onclick="loginComGoogle()">Login com Google</button>

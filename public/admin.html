@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administração - Salão de Beleza</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/responsividade.css">
+</head>
+<body>
+  <!-- Topbar -->
+    <div class="topbar">
+        <button class="sidebar-toggle d-md-none">
+        <i class="bi bi-list"></i>
+        </button>
+        <div class="topbar-logo">
+        <img src="img/LogoPaulaTrancas.png" alt="Logo" class="logo-img">
+        <span class="logo-text">Salão Paula tranças</span>
+        </div>
+        
+        <div class="search-bar-container">
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar...">
+        </div>
+        </div>
+        
+        <div class="topbar-right">
+        <div class="user-welcome">
+            <span class="welcome-text">Seja bem vinda, Paula!</span>
+            <img src="img/PerfilPaula.png" alt="Foto do usuário" class="user-photo">
+        </div>
+        <div class="notification-icon">
+            <i class="bi bi-bell"></i>
+            <span class="notification-badge">3</span>
+        </div>
+        </div>
+    </div>
+
+ <!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+      <img src="https://via.placeholder.com/40" alt="Logo" class="logo-img">
+    </div>
+    <div class="sidebar-menu">
+      <ul class="nav flex-column" id="sidebarTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="home-tab" data-bs-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">
+            <i class="bi bi-house-door"></i>
+            <span class="menu-text">Home</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link active" id="categories-tab" data-bs-toggle="tab" href="#categories" role="tab" aria-controls="categories" aria-selected="true">
+            <i class="bi bi-tags"></i>
+            <span class="menu-text">Categorias</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="services-tab" data-bs-toggle="tab" href="#services" role="tab" aria-controls="services" aria-selected="false">
+            <i class="bi bi-scissors"></i>
+            <span class="menu-text">Serviços</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="employees-tab" data-bs-toggle="tab" href="#employees" role="tab" aria-controls="employees" aria-selected="false">
+            <i class="bi bi-people"></i>
+            <span class="menu-text">Funcionários</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="appointments-tab" data-bs-toggle="tab" href="#appointments" role="tab" aria-controls="appointments" aria-selected="false">
+            <i class="bi bi-calendar-check"></i>
+            <span class="menu-text">Agendamentos</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false">
+            <i class="bi bi-person-plus"></i>
+            <span class="menu-text">Usuários</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="coupons-tab" data-bs-toggle="tab" href="#coupons" role="tab" aria-controls="coupons" aria-selected="false">
+            <i class="bi bi-percent"></i>
+            <span class="menu-text">Cupons</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="revenue-tab" data-bs-toggle="tab" href="#revenue" role="tab" aria-controls="revenue" aria-selected="false">
+            <i class="bi bi-cash-coin"></i>
+            <span class="menu-text">Receita</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">
+            <i class="bi bi-gear"></i>
+            <span class="menu-text">Configurações</span>
+          </a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" href="#" onclick="logout()">
+            <i class="bi bi-door-open"></i>
+            <span class="menu-text">Sair</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="tab-content">
+      <!-- Home -->
+      <div class="tab-pane fade" id="home">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Visão Geral</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Visão Geral</li>
+          </ol>
+        </div>
+        
+        <div class="row">
+            <!-- Gráfico de Funcionários (Ativos/Inativos) -->
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Status dos Funcionários</h5>
+                  <div class="chart-container">
+                    <div class="chart-loading">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                      </div>
+                    </div>
+                    <canvas id="employeesChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Gráfico de Categorias -->
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Total de Categorias</h5>
+                  <div class="chart-container">
+                    <div class="chart-loading">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                      </div>
+                    </div>
+                    <canvas id="categoriesChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Gráfico de Serviços -->
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Total de Serviços</h5>
+                  <div class="chart-container">
+                    <div class="chart-loading">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                      </div>
+                    </div>
+                    <canvas id="servicesChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Gráfico de Agendamentos -->
+            <div class="col-md-6 col-lg-6 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Agendamentos por Mês</h5>
+                  <div class="chart-container">
+                    <div class="chart-loading">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                      </div>
+                    </div>
+                    <canvas id="appointmentsChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Novo Gráfico de Usuários -->
+            <div class="col-md-6 col-lg-3 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Distribuição de Usuários</h5>
+                  <div class="chart-container">
+                    <div class="chart-loading">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                      </div>
+                    </div>
+                    <canvas id="usersChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Novo Gráfico de Cupons -->
+            <div class="col-md-6 col-lg-3 mb-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Status dos Cupons</h5>
+                  <div class="chart-container">
+                    <div class="chart-loading">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                      </div>
+                    </div>
+                    <canvas id="couponsChart" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      <!-- Categorias -->
+      <div class="tab-pane fade show active" id="categories">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Categorias de Serviços</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Categorias</li>
+          </ol>
+        </div>
+        
+        <div class="form-section">
+          <h4 class="mb-3">Adicionar/Editar Categoria</h4>
+          <form id="categoryForm">
+            <input type="hidden" id="categoryId">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="categoryName" class="form-label">Nome da Categoria</label>
+                  <input type="text" class="form-control" id="categoryName" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="categoryImage" class="form-label">Imagem da Categoria</label>
+                  <input type="file" class="form-control" id="categoryImage" accept="image/*">
+                  <div id="categoryImagePreview" class="mt-2"></div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <button type="button" class="btn btn-secondary" id="cancelCategoryEdit">Cancelar</button>
+              </div>
+          </form>
+        </div>
+        
+        <div class="table-responsive mt-4">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="categoriesTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Serviços -->
+      <div class="tab-pane fade" id="services">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Serviços</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Serviços</li>
+          </ol>
+        </div>
+        
+        <div class="form-section">
+          <h4 class="mb-3">Adicionar/Editar Serviço</h4>
+          <form id="serviceForm">
+            <input type="hidden" id="serviceId">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="serviceImage" class="form-label">Imagem do Serviço</label>
+                <input type="file" class="form-control" id="serviceImage" accept="image/*">
+                <div id="serviceImagePreview" class="mt-2"></div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="serviceCategory" class="form-label">Categoria</label>
+                <select class="form-select" id="serviceCategory" required></select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="serviceName" class="form-label">Nome do Serviço</label>
+                <input type="text" class="form-control" id="serviceName" required>
+              </div>
+              <div class="col-md-6">
+                <label for="servicePrice" class="form-label">Preço (R$)</label>
+                <input type="number" step="0.01" class="form-control" id="servicePrice">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="serviceDuration" class="form-label">Duração (minutos)</label>
+                <input type="number" class="form-control" id="serviceDuration" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label for="serviceDescription" class="form-label">Descrição</label>
+                <textarea class="form-control" id="serviceDescription" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">Salvar</button>
+              <button type="button" class="btn btn-secondary" id="cancelServiceEdit">Cancelar</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="table-responsive mt-4">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Duração</th>
+                <th>Preço</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="servicesTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Funcionários -->
+      <div class="tab-pane fade" id="employees">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Funcionários</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Funcionários</li>
+          </ol>
+        </div>
+        
+        <div class="form-section">
+          <h4 class="mb-3">Adicionar/Editar Funcionário</h4>
+          <form id="employeeForm">
+            <input type="hidden" id="employeeId">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="employeeName" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="employeeName" required>
+              </div>
+              <div class="col-md-6">
+                <label for="employeeEmail" class="form-label">E-mail</label>
+                <input type="email" class="form-control" id="employeeEmail" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="employeePhone" class="form-label">Telefone</label>
+                <input type="tel" class="form-control" id="employeePhone">
+              </div>
+              <div class="col-md-6">
+                <label for="employeeComissao" class="form-label">Comissão</label>
+                <input type="number" step="0.01" class="form-control" id="employeeComissao">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Status</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="employeeStatus" checked>
+                  <label class="form-check-label" for="employeeStatus">Ativo</label>
+                </div>
+              </div>
+              <div class="col-md-6 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-primary" id="manageServicesBtn" style="display: none;">
+                  <i class="bi bi-gear"></i> Gerenciar Serviços
+                </button>
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-primary" id="manageSchedulesBtn" style="display: none;">
+                  <i class="bi bi-clock"></i> Gerenciar Horários
+                </button>
+              </div>
+            </div>
+
+            <h5 class="mt-4">Horário de Trabalho</h5>
+            <div id="workSchedulesContainer">
+              <!-- Os horários serão adicionados dinamicamente aqui -->
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addScheduleBtn">
+              <i class="bi bi-plus"></i> Adicionar Dia
+            </button>
+            
+            <div class="mt-4 d-flex gap-2">
+              <button type="submit" class="btn btn-primary">Salvar</button>
+              <button type="button" class="btn btn-secondary" id="cancelEmployeeEdit">Cancelar</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal de Gerenciamento de Serviços -->
+        <div class="modal fade" id="manageServicesModal" tabindex="-1" aria-labelledby="manageServicesModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="manageServicesModalLabel">Gerenciar Serviços do Funcionário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="serviceSearch" class="form-label">Pesquisar Serviços</label>
+                  <input type="text" class="form-control" id="serviceSearch" placeholder="Digite para filtrar serviços...">
+                </div>
+                
+                <div class="list-group" id="servicesList">
+                  <!-- Lista de serviços será carregada aqui -->
+                  <div class="text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Carregando...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="saveServicesBtn">Salvar Alterações</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal de Gerenciamento de Horários -->
+
+        
+        <div class="table-responsive mt-4">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Comissão</th>
+                <th>Status</th>
+                <th>Horários</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="employeesTable"></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Modal para confirmar exclusão -->
+      <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Confirmar Exclusão</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Tem certeza que deseja excluir este funcionário?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Agendamentos -->
+      <div class="tab-pane fade" id="appointments">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Agendamentos</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Agendamentos</li>
+          </ol>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-3 mb-2">
+            <div class="input-group">
+              <input type="text" class="form-control" id="appointmentSearch" placeholder="Pesquisar cliente...">
+              <button class="btn btn-outline-secondary" type="button" id="searchAppointments">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-3 mb-2">
+            <div class="input-group">
+              <input type="date" class="form-control" id="appointmentDateFilter">
+              <button class="btn btn-outline-secondary" type="button" id="filterByDateBtn">
+                Filtrar por Data
+              </button>
+            </div>
+          </div>
+          <div class="col-md-3 mb-2">
+            <div class="input-group">
+              <input type="text" class="form-control" id="employeeSearch" placeholder="Pesquisar funcionário...">
+              <button class="btn btn-outline-secondary" type="button" id="filterByEmployee">
+                Filtrar
+              </button>
+            </div>
+          </div>
+          <div class="col-md-3 mb-2">
+            <button class="btn btn-outline-danger w-100" type="button" id="clearFilters">
+              Limpar Filtros
+            </button>
+          </div>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Profissional</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="appointmentsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Usuários -->
+      <div class="tab-pane fade" id="users">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Gerenciamento de Usuários</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Usuários</li>
+          </ol>
+        </div>
+        
+        <div class="form-section mb-4">
+          <h4 class="mb-3">Adicionar/Editar Usuário</h4>
+          <form id="userForm">
+            <input type="hidden" id="userId">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="userUsername" class="form-label">Usuário</label>
+                <input type="text" class="form-control" id="userUsername" required>
+              </div>
+              <div class="col-md-6">
+                <label for="userEmail" class="form-label">E-mail</label>
+                <input type="email" class="form-control" id="userEmail" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="userPassword" class="form-label">Senha</label>
+                <div class="input-group">
+                  <input type="password" class="form-control password-input" id="userPassword">
+                  <button class="btn btn-outline-secondary toggle-password" type="button">
+                    <i class="bi bi-eye-slash-fill"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="userType" class="form-label">Tipo de Usuário</label>
+                <select class="form-select" id="userType" required>
+                  <option value="comum">Comum</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">Salvar</button>
+              <button type="button" class="btn btn-secondary" id="cancelUserEdit">Cancelar</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>E-mail</th>
+                <th>Tipo</th>
+                <th>Data de Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Cupons -->
+      <div class="tab-pane fade" id="coupons">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Gerenciamento de Cupons</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Cupons</li>
+          </ol>
+        </div>
+        
+        <div class="form-section mb-4">
+          <h4 class="mb-3">Adicionar/Editar Cupom</h4>
+          <form id="couponForm">
+            <input type="hidden" id="couponId">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="couponName" class="form-label">Nome do Cupom</label>
+                <input type="text" class="form-control" id="couponName" required>
+              </div>
+              <div class="col-md-6">
+                <label for="couponCode" class="form-label">Código</label>
+                <input type="text" class="form-control" id="couponCode" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="couponDiscountType" class="form-label">Tipo de Desconto</label>
+                <select class="form-select" id="couponDiscountType" required>
+                  <option value="percentage">Porcentagem</option>
+                  <option value="fixed">Valor Fixo</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="couponDiscountValue" class="form-label">Valor do Desconto</label>
+                <input type="number" step="0.01" class="form-control" id="couponDiscountValue" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="couponValidFrom" class="form-label">Válido de</label>
+                <input type="datetime-local" class="form-control" id="couponValidFrom">
+              </div>
+              <div class="col-md-6">
+                <label for="couponValidUntil" class="form-label">Válido até</label>
+                <input type="datetime-local" class="form-control" id="couponValidUntil">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="couponMaxUses" class="form-label">Máximo de Usos (0 = ilimitado)</label>
+                <input type="number" class="form-control" id="couponMaxUses" min="0" value="0">
+              </div>
+              <div class="col-md-6">
+                <label for="couponMinValue" class="form-label">Valor Mínimo do Serviço</label>
+                <input type="number" step="0.01" class="form-control" id="couponMinValue" min="0" value="0">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label for="couponDescription" class="form-label">Descrição</label>
+                <textarea class="form-control" id="couponDescription" rows="2"></textarea>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Status</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="couponStatus" checked>
+                  <label class="form-check-label" for="couponStatus">Ativo</label>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">Salvar</button>
+              <button type="button" class="btn btn-secondary" id="cancelCouponEdit">Cancelar</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>Desconto</th>
+                <th>Válido até</th>
+                <th>Usos</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="couponsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Receitas -->
+      <div class="tab-pane fade" id="revenue">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Relatório de Receitas</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Receitas</li>
+          </ol>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 mb-2">
+                <label for="startDate" class="form-label">Data Inicial</label>
+                <input type="date" class="form-control" id="startDate">
+              </div>
+              <div class="col-md-3 mb-2">
+                <label for="endDate" class="form-label">Data Final</label>
+                <input type="date" class="form-control" id="endDate">
+              </div>
+              <div class="col-md-3 mb-2 d-flex align-items-end">
+                <button class="btn btn-primary" id="applyFilter">
+                  <i class="bi bi-funnel me-2"></i>Aplicar Filtro
+                </button>
+              </div>
+              <div class="col-md-3 mb-2 d-flex align-items-end justify-content-end">
+                <button class="btn btn-outline-secondary" id="resetFilter">
+                  <i class="bi bi-arrow-counterclockwise me-2"></i>Limpar Filtros
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Cards Resumo -->
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card border-primary">
+              <div class="card-body">
+                <h5 class="card-title text-primary">Total de Agendamentos</h5>
+                <h2 class="card-text" id="totalAppointments">0</h2>
+                <p class="text-muted">No período selecionado</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-success">
+              <div class="card-body">
+                <h5 class="card-title text-success">Faturamento Total</h5>
+                <h2 class="card-text" id="totalRevenue">R$ 0,00</h2>
+                <p class="text-muted">No período selecionado</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-info">
+              <div class="card-body">
+                <h5 class="card-title text-info">Comissões a Pagar</h5>
+                <h2 class="card-text" id="totalCommissions">R$ 0,00</h2>
+                <p class="text-muted">No período selecionado</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tabela de Detalhes -->
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Detalhes das Receitas</h5>
+            <button class="btn btn-sm btn-outline-primary" id="exportReport">
+              <i class="bi bi-download me-1"></i>Excel
+            </button>
+            <button id="exportPdf" class="btn btn-sm btn-outline-danger">
+              <i class="fas fa-file-pdf"></i>PDF
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Profissional</th>
+                    <th>Agendamentos</th>
+                    <th>Faturamento</th>
+                    <th>Comissão (%)</th>
+                    <th>Valor Comissão</th>
+                    <th>Lucro Líquido</th>
+                  </tr>
+                </thead>
+                <tbody id="revenueDetails">
+                  <tr>
+                    <td colspan="6" class="text-center">Selecione um período para visualizar os dados</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configurações -->
+      <div class="tab-pane fade" id="settings">
+        <div class="page-header mb-4">
+          <div class="page-title">
+            <h1>Configurações</h1>
+          </div>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active">Configurações</li>
+          </ol>
+        </div>
+        
+        <div class="row mb-4 align-items-stretch">
+          <div class="col-md-6 mb-3">
+            <div class="card h-100">
+              <div class="card-body cardConfig">
+                <h5 class="card-title">Tema</h5>
+                <button id="themeToggle" class="btn btn-outline-primary">
+                  <i class="bi bi-moon-fill"></i> Alternar para Modo Escuro
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="card h-100">
+              <div class="card-body cardConfig">
+                <h5 class="card-title">Data e Hora</h5>
+                <div id="currentDateTime">
+                  <div class="date-display" id="dataAtual">--/--/----</div>
+                  <div class="time-display" id="tempoAtual">--:--:--</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Meu Perfil</h5>
+            
+            <div class="mb-4 p-3 border rounded" id="userInfo">
+              <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p>Carregando dados do usuário...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">Confirmar Ação</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modalBody">
+            Tem certeza que deseja excluir este item?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="confirmAction">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template para um item de horário (hidden) -->
+    <div class="d-none">
+      <div id="scheduleItemTemplate">
+        <div class="card mb-3 schedule-item" data-id="">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Dia da Semana</label>
+                <select class="form-select day-select">
+                  <option value="">Selecione um dia</option>
+                  <option value="0">Segunda-feira</option>
+                  <option value="1">Terça-feira</option>
+                  <option value="2">Quarta-feira</option>
+                  <option value="3">Quinta-feira</option>
+                  <option value="4">Sexta-feira</option>
+                  <option value="5">Sábado</option>
+                  <option value="6">Domingo</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Horário de Entrada</label>
+                <input type="time" class="form-control start-time" value="08:00">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Horário de Saída</label>
+                <input type="time" class="form-control end-time" value="17:00">
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger btn-sm remove-schedule">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de feedback -->
+    <div id="userFeedback" class="mb-3"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/responsividade.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/users.js"></script>
+  <script src="js/cupom.js"></script>
+  <script src="js/receitas.js"></script>
+  <script src="js/horarioFuncionario.js"></script>
+</body>
+</html>

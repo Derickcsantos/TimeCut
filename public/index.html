@@ -3,11 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content=" Dérick campos santos, Derick, Dking">
+  <meta name="language" content="pt-BR">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="generator" content="Visual studio code">
+  <meta name="description" content="Salão de beleza especializado em tranças e alongamentos.">
+  <meta name="keywords" content="Paula, Paula Tranças, Tranças, Agenda, Agendar trança, Salão, Sistema de agendamento, Me conheça, Derick Campos, Derick, Derick Campos Santos">
+  <meta name="keyword" content="Paula, Paula Tranças, Tranças, Agenda, Agendar trança, Salão, Sistema de agendamento, Me conheça, Derick Campos, Derick, Derick Campos Santos">
+
+  <meta name="country" content="Brazil">
+  <meta name="language" content="Portuguese, PT-BR">
+  <meta name="geography" content="São Paulo, SP">
+  <meta name="copyright" content="https://agendaagora.onrender.com/home">
+
+  <meta name="google-site-verification" content="ygBvn69LM73T3rI5Fe8LUUrlqCqr3ggeqVjrwf85rug" />
+  <meta name="googlebot" content="index, follow">
+  <meta name="baidubot" content="index, follow">
+  <meta name="slurp" content="index, follow">
+  <meta name="yahoobot" content="index, follow">
+  <meta name="unknownbot" content="index, follow">
+  <meta name="msnbot" content="index, follow">
+  <meta name="robots" content="index,follow">
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"> 
+  <meta http-equiv="Pragma" content="public">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <meta property="og:title" content="Paula Tranças e Alongamentos | Salão de Beleza">
+  <meta property="og:site_name" content="Paula Tranças e Alongamentos | Salão de Beleza">
+  <meta property="og:description" content="Salão de beleza">
+  <meta property="og:image" content="img/LogoPaulaTrancas.png">
+  <meta property="og:url" content="https://agendaagora.onrender.com/home">
+  <meta property="og:image:width" content="700">
+  <meta property="og:image:height" content="366">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt-BR">
+  <meta property="og:locale:alternate" content="en-US">
+  <meta property="og:locale:alternate" content="es-ES">
+  <meta property="og:locale:alternate" content="fr-FR">
+  <meta property="og:locale:alternate" content="de-DE">
+  <meta property="og:locale:alternate" content="it-IT">
+  <meta property="og:locale:alternate" content="ja-JP">
+  <meta property="og:locale:alternate" content="ko-KR">
+  <meta property="og:locale:alternate" content="zh-CN">
+  <meta property="og:locale:alternate" content="zh-TW">
+  <meta property="og:locale:alternate" content="ru-RU">
+  <meta property="og:locale:alternate" content="ar-SA">
+  <meta property="og:locale:alternate" content="pt-PT">
+  <meta property="og:locale:alternate" content="pt-AO">
+  <meta property="og:locale:alternate" content="pt-MZ">
+
+  <link rel="icon" style="border-radius: 50%;" href="img/LogoPaulaTrancas.png" type="image/png">
   <title>Agendamento - Salão de Beleza</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/agenda.css">
   <!-- CSS do Choices.js -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
   <!-- JS do Choices.js -->
@@ -15,66 +68,72 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+
+  <i onclick="window.location.href='/home'" class="bi bi-house-door icon-home"></i>
+
+  <button type="button" class="btn btn-primary btn-login" onclick="window.location.href='/login'">Login</button>
   <div class="container py-5">
     <h1 class="text-center mb-5">Agende seu horário</h1>
     
     <div class="card">
       <div class="card-header">
         <ul class="nav nav-pills card-header-pills justify-content-center">
-          <li class="nav-item"><a class="nav-link step-indicator active" data-step="1">Categoria</a></li>
-          <li class="nav-item"><a class="nav-link step-indicator" data-step="2">Serviço</a></li>
-          <li class="nav-item"><a class="nav-link step-indicator" data-step="3">Profissional</a></li>
-          <li class="nav-item"><a class="nav-link step-indicator" data-step="4">Data</a></li>
-          <li class="nav-item"><a class="nav-link step-indicator" data-step="5">Horário</a></li>
-          <li class="nav-item"><a class="nav-link step-indicator" data-step="6">Cupom</a></li>
-          <li class="nav-item"><a class="nav-link step-indicator" data-step="7">Confirmar</a></li>
+          <li class="nav-item"><a class="nav-link step-indicator active" id="iconCategoria" data-step="1"><i class="bi bi-bookmark"></i></a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" id="iconServico" data-step="2"><i class="bi bi-scissors"></i></a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" id="iconFuncionario" data-step="3"><i class="bi bi-person-check-fill"></i></a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" id="iconData" data-step="4"><i class="bi bi-calendar-check"></i></a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" id="iconHorario" data-step="5"><i class="bi bi-stopwatch"></i></a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" id="iconCupom" data-step="6"><i class="bi bi-coin"></i></a></li>
+          <li class="nav-item"><a class="nav-link step-indicator" id="iconConfirmacao" data-step="7"><i class="bi bi-check2"></i></a></li>
         </ul>
       </div>
       
       <div class="card-body">
         <form id="appointmentForm">
           <!-- Passo 1: Selecionar Categoria  -->
+         <!-- Passo 1: Selecionar Categoria -->
           <div class="step active" id="step1">
             <h3>Selecione a categoria</h3>
             <div class="mb-3">
-              <label for="category" class="form-label">Categoria</label>
-              <select class="form-select" id="category" required>
-                <option value="" selected disabled>Selecione uma categoria</option>
-              </select>
+              <label class="form-label">Categoria</label>
+              <div id="categories-container" class="items-container">
+                <!-- Itens serão carregados aqui via JavaScript -->
+                <div class="loading">Carregando categorias...</div>
+              </div>
             </div>
             <div class="d-flex justify-content-between">
               <button type="button" class="btn btn-secondary" disabled>Voltar</button>
-              <button type="button" class="btn btn-primary next-step" data-next="2">Próximo</button>
+              <button type="button" class="btn btn-light next-step" data-next="2" style="background-color: #7c3aed; color: white;">Próximo</button>
             </div>
           </div>
-          
+
           <!-- Passo 2: Selecionar Serviço -->
           <div class="step" id="step2">
             <h3>Selecione o serviço</h3>
             <div class="mb-3">
-              <label for="service" class="form-label">Serviço</label>
-              <select class="form-select" id="service" required>
-                <option value="" selected disabled>Selecione um serviço</option>
-              </select>
+              <label class="form-label">Serviço</label>
+              <div id="services-container" class="items-container">
+                <div class="empty-message">Selecione uma categoria primeiro</div>
+              </div>
             </div>
             <div class="d-flex justify-content-between">
               <button type="button" class="btn btn-secondary prev-step" data-prev="1">Voltar</button>
-              <button type="button" class="btn btn-primary next-step" data-next="3">Próximo</button>
+              <button type="button" class="btn btn-light next-step" data-next="3" style="background-color: #7c3aed; color: white;">Próximo</button>
             </div>
           </div>
-          
+
           <!-- Passo 3: Selecionar Profissional -->
           <div class="step" id="step3">
             <h3>Selecione o profissional</h3>
             <div class="mb-3">
-              <label for="employee" class="form-label">Profissional</label>
-              <select class="form-select" id="employee" required>
-                <option value="" selected disabled>Selecione um profissional</option>
-              </select>
+              <label class="form-label">Profissional</label>
+              <div id="employees-container" class="items-container">
+                <div class="empty-message">Selecione um serviço primeiro</div>
+              </div>
             </div>
             <div class="d-flex justify-content-between">
               <button type="button" class="btn btn-secondary prev-step" data-prev="2">Voltar</button>
-              <button type="button" class="btn btn-primary next-step" data-next="4">Próximo</button>
+              <button type="button" class="btn btn-light next-step" data-next="4" style="background-color: #7c3aed; color: white;">Próximo</button>
             </div>
           </div>
           
@@ -87,7 +146,7 @@
             </div>
             <div class="d-flex justify-content-between">
               <button type="button" class="btn btn-secondary prev-step" data-prev="3">Voltar</button>
-              <button type="button" class="btn btn-primary next-step" data-next="5">Próximo</button>
+              <button type="button" class="btn btn-light next-step" data-next="5"  style="background-color: #7c3aed; color: white;">Próximo</button>
             </div>
           </div>
           
@@ -101,7 +160,7 @@
             <input type="hidden" id="selectedTime" required>
             <div class="d-flex justify-content-between">
               <button type="button" class="btn btn-secondary prev-step" data-prev="4">Voltar</button>
-              <button type="button" class="btn btn-primary next-step" data-next="6">Próximo</button>
+              <button type="button" class="btn btn-light next-step" data-next="6"  style="background-color: #7c3aed; color: white;">Próximo</button>
             </div>
           </div>
 
@@ -118,7 +177,7 @@
             </div>
             <div class="d-flex justify-content-between">
               <button type="button" class="btn btn-secondary prev-step" data-prev="5">Voltar</button>
-              <button type="button" class="btn btn-primary next-step" data-next="7">Próximo</button>
+              <button type="button" class="btn btn-primary next-step" data-next="7"  style="background-color: #7c3aed; color: white;">Próximo</button>
             </div>
           </div>
 
@@ -178,16 +237,19 @@
         <div class="modal-footer d-flex justify-content-between">
           <div class="btn-group">
             <button type="button" class="btn btn-success" id="whatsappBtn">
-              <i class="bi bi-whatsapp"></i> WhatsApp
+              <i class="bi bi-whatsapp"></i> 
+             <span class="share-btn">Whatsapp</span>
             </button>
             <button type="button" class="btn btn-danger" id="emailBtn">
-              <i class="bi bi-envelope"></i> Email
+              <i class="bi bi-envelope"></i>
+              <span class="share-btn">Email</span>
             </button>
             <!-- <button type="button" class="btn btn-danger" id="pdfBtn">
               <i class="bi bi-file-earmark-pdf"></i> PDF
             </button> -->
             <button type="button" class="btn btn-primary text-white" id="calendarBtn">
-              <i class="bi bi-calendar-event"></i> Calendário
+              <i class="bi bi-calendar-event"></i> 
+              <span class="share-btn">Calendário</span>
             </button>
           </div>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>

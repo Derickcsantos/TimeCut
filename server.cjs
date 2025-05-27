@@ -11,8 +11,6 @@ const ExcelJS = require('exceljs');
 const multer = require('multer');
 const fs = require('fs');
 const mongoose = require('mongoose');
-const upload = multer();
-
 
 let whatsappClient = null;
 const SESSION_DIR = path.join(__dirname, 'tokens');
@@ -39,51 +37,50 @@ const corsOptions = {
   credentials: true,        // Permite cookies (importante se for necessário)
 };
 
-const mongoURI = process.env.MONGO_URI || 'mongodb+srv://derickcampos:Dede%4002%40@cluster0.zw6awrd.mongodb.net/galeria?retryWrites=true&w=majority'
-
-
-// Conexão com MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 10000,
-  socketTimeoutMS: 45000
 })
-.then(() => console.log('✅ MongoDB conectado com sucesso'))
-.catch(err => {
-  console.error('❌ Falha na conexão com MongoDB:', err);
-  process.exit(1);
+.then(() => console.log('MongoDB conectado com sucesso'))
+.catch(err => console.error('Erro ao conectar ao MongoDB:', err));
+
+// Modelo para galeria
+const galeriaSchema = new mongoose.Schema({
+  titulo: { type: String, required: true },
+  imagem: { type: String, required: true }, // Caminho da imagem no servidor
+  criadoEm: { type: Date, default: Date.now }
 });
 
-// Modelo da Galeria
-const ImagemSchema = new mongoose.Schema({
-  dados: {
-    type: Buffer,
-    required: true
+const Galeria = mongoose.model('Galeria', galeriaSchema);
+// Configuração do Multer para upload de imagens
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, 'public/uploads');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
-  tipo: {
-    type: String,
-    required: true
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   }
-}, { _id: false });
+});
 
-const GaleriaSchema = new mongoose.Schema({
-  titulo: {
-    type: String,
-    default: 'Sem título'
+const upload = multer({ 
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Apenas imagens são permitidas!'), false);
+    }
   },
-  imagem: {
-    type: ImagemSchema,
-    required: true
-  },
-  criadoEm: {
-    type: Date,
-    default: Date.now
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
   }
-}, { versionKey: false });
-
-const Galeria = mongoose.model('Galeria', GaleriaSchema);
-
+});
 
 // Middlewares
 app.use(cors(corsOptions));
@@ -669,22 +666,11 @@ app.get('/api/categories', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('categories')
-      .select('id, name, imagem_category')
+      .select('id, name, imagem_category') // Adicionar imagem_category
       .order('name', { ascending: true });
 
     if (error) throw error;
-    
-    // Converter imagens base64 para URLs de dados
-    const categoriesWithImages = data.map(category => {
-      return {
-        ...category,
-        imagem_category: category.imagem_category 
-          ? `data:image/jpeg;base64,${category.imagem_category}`
-          : null
-      };
-    });
-    
-    res.json(categoriesWithImages);
+    res.json(data);
   } catch (error) {
     console.error('Error fetching categories:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -696,55 +682,28 @@ app.get('/api/services/:categoryId', async (req, res) => {
     const { categoryId } = req.params;
     const { data, error } = await supabase
       .from('services')
-      .select('id, name, price, duration, imagem_service')
+      .select('id, name, price, duration, imagem_service') // Adicionar imagem_service
       .eq('category_id', categoryId)
       .order('name', { ascending: true });
 
     if (error) throw error;
-    
-    // Converter imagens base64 para URLs de dados
-    const servicesWithImages = data.map(service => {
-      return {
-        ...service,
-        imagem_service: service.imagem_service 
-          ? `data:image/jpeg;base64,${service.imagem_service}`
-          : null
-      };
-    });
-    
-    res.json(servicesWithImages);
+    res.json(data);
   } catch (error) {
     console.error('Error fetching services:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Rota GET para funcionários (converte bytea para URL de dados)
 app.get('/api/employees/:serviceId', async (req, res) => {
   try {
     const { serviceId } = req.params;
     const { data, error } = await supabase
       .from('employee_services')
-      .select(`
-        employees(
-          id,
-          name,
-          imagem_funcionario,
-          is_active
-        )
-      `)
+      .select('employees(*)')
       .eq('service_id', serviceId);
 
     if (error) throw error;
-    
-    // Converter imagens base64 para URLs de dados
-    const employees = data.map(item => ({
-      ...item.employees,
-      imagem_funcionario: item.employees.imagem_funcionario 
-        ? `data:image/jpeg;base64,${item.employees.imagem_funcionario}`
-        : null
-    }));
-    
+    const employees = data.map(item => item.employees);
     res.json(employees);
   } catch (error) {
     console.error('Error fetching employees:', error);
@@ -1074,18 +1033,13 @@ app.get('/api/admin/categories/:id', async (req, res) => {
 app.post('/api/admin/categories', upload.single('image'), async (req, res) => {
   try {
     const { name } = req.body;
-    let imageData = null;
-
-    // Se houver arquivo, converte para buffer
-    if (req.file) {
-      imageData = req.file.buffer.toString('base64');
-    }
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     const { data, error } = await supabase
       .from('categories')
       .insert([{ 
         name, 
-        imagem_category: imageData 
+        imagem_category: imagePath 
       }])
       .select();
 
@@ -1093,30 +1047,43 @@ app.post('/api/admin/categories', upload.single('image'), async (req, res) => {
     res.status(201).json(data[0]);
   } catch (error) {
     console.error('Error creating category:', error);
+    // Remove o arquivo se houve erro
+    if (req.file) fs.unlinkSync(path.join(__dirname, 'public', req.file.path));
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
+
 
 // Atualize a rota PUT de categorias
 app.put('/api/admin/categories/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
-    let imageData = null;
+    let imagePath = null;
 
-    // Se enviou nova imagem, converte para base64
+    // Se enviou nova imagem
     if (req.file) {
-      imageData = req.file.buffer.toString('base64');
-    }
+      imagePath = `/uploads/${req.file.filename}`;
+      
+      // Busca a categoria antiga para remover a imagem anterior
+      const { data: oldCategory } = await supabase
+        .from('categories')
+        .select('imagem_category')
+        .eq('id', id)
+        .single();
 
-    const updateData = { 
-      name,
-      ...(imageData && { imagem_category: imageData })
-    };
+      if (oldCategory?.imagem_category) {
+        const oldImagePath = path.join(__dirname, 'public', oldCategory.imagem_category);
+        if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
+      }
+    }
 
     const { data, error } = await supabase
       .from('categories')
-      .update(updateData)
+      .update({ 
+        name,
+        ...(imagePath && { imagem_category: imagePath })
+      })
       .eq('id', id)
       .select();
 
@@ -1124,6 +1091,7 @@ app.put('/api/admin/categories/:id', upload.single('image'), async (req, res) =>
     res.json(data[0]);
   } catch (error) {
     console.error('Error updating category:', error);
+    if (req.file) fs.unlinkSync(path.join(__dirname, 'public', req.file.path));
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
@@ -1175,16 +1143,11 @@ app.get('/api/admin/services', async (req, res) => {
   }
 });
 
-// Rota POST de serviços
+// Atualize as rotas de serviços similarmente
 app.post('/api/admin/services', upload.single('image'), async (req, res) => {
   try {
     const { category_id, name, description, duration, price } = req.body;
-    let imageData = null;
-
-    // Se houver arquivo, converte para base64
-    if (req.file) {
-      imageData = req.file.buffer.toString('base64');
-    }
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     const { data, error } = await supabase
       .from('services')
@@ -1194,7 +1157,7 @@ app.post('/api/admin/services', upload.single('image'), async (req, res) => {
         description, 
         duration, 
         price,
-        imagem_service: imageData
+        imagem_service: imagePath
       }])
       .select();
 
@@ -1202,6 +1165,7 @@ app.post('/api/admin/services', upload.single('image'), async (req, res) => {
     res.status(201).json(data[0]);
   } catch (error) {
     console.error('Error creating service:', error);
+    if (req.file) fs.unlinkSync(path.join(__dirname, 'public', req.file.path));
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
@@ -1225,30 +1189,37 @@ app.get('/api/admin/services/:id', async (req, res) => {
   }
 });
 
-// Rota PUT de serviços
 app.put('/api/admin/services/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
     const { category_id, name, description, duration, price } = req.body;
-    let imageData = null;
+    let imagePath = null;
 
-    // Se enviou nova imagem, converte para base64
     if (req.file) {
-      imageData = req.file.buffer.toString('base64');
-    }
+      imagePath = `/uploads/${req.file.filename}`;
+      
+      const { data: oldService } = await supabase
+        .from('services')
+        .select('imagem_service')
+        .eq('id', id)
+        .single();
 
-    const updateData = { 
-      category_id,
-      name,
-      description,
-      duration,
-      price,
-      ...(imageData && { imagem_service: imageData })
-    };
+      if (oldService?.imagem_service) {
+        const oldImagePath = path.join(__dirname, 'public', oldService.imagem_service);
+        if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
+      }
+    }
 
     const { data, error } = await supabase
       .from('services')
-      .update(updateData)
+      .update({ 
+        category_id,
+        name,
+        description,
+        duration,
+        price,
+        ...(imagePath && { imagem_service: imagePath })
+      })
       .eq('id', id)
       .select();
 
@@ -1256,6 +1227,7 @@ app.put('/api/admin/services/:id', upload.single('image'), async (req, res) => {
     res.json(data[0]);
   } catch (error) {
     console.error('Error updating service:', error);
+    if (req.file) fs.unlinkSync(path.join(__dirname, 'public', req.file.path));
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
@@ -1340,18 +1312,9 @@ app.get('/api/admin/employees/:id', async (req, res) => {
   }
 });
 
-// Rota POST para funcionários
-app.post('/api/admin/employees', upload.single('image'), async (req, res) => {
+app.post('/api/admin/employees', async (req, res) => {
   try {
-    // Extrair dados do corpo da requisição
-    const { name, email, phone, comissao, is_active } = req.body;
-    let imageData = null;
-
-    // Se houver arquivo, converte para base64
-    if (req.file) {
-      imageData = req.file.buffer.toString('base64');
-    }
-
+    const { name, email, phone, comissao , is_active } = req.body;
     const { data, error } = await supabase
       .from('employees')
       .insert([{ 
@@ -1359,8 +1322,7 @@ app.post('/api/admin/employees', upload.single('image'), async (req, res) => {
         email, 
         phone,
         comissao, 
-        imagem_funcionario: imageData,
-        is_active: is_active === 'true' || is_active === true
+        is_active: is_active !== false 
       }])
       .select();
 
@@ -1372,30 +1334,19 @@ app.post('/api/admin/employees', upload.single('image'), async (req, res) => {
   }
 });
 
-// Rota PUT para funcionários
-app.put('/api/admin/employees/:id', upload.single('image'), async (req, res) => {
+app.put('/api/admin/employees/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, comissao, is_active } = req.body;
-    let imageData = null;
-
-    // Se enviou nova imagem, converte para base64
-    if (req.file) {
-      imageData = req.file.buffer.toString('base64');
-    }
-
-    const updateData = { 
-      name, 
-      email, 
-      phone, 
-      comissao,
-      is_active: is_active === 'true' || is_active === true,
-      ...(imageData && { imagem_funcionario: imageData })
-    };
-
+    const { name, email, phone, comissao , is_active } = req.body;
     const { data, error } = await supabase
       .from('employees')
-      .update(updateData)
+      .update({ 
+        name, 
+        email, 
+        phone, 
+        comissao,
+        is_active 
+      })
       .eq('id', id)
       .select();
 
@@ -2180,108 +2131,66 @@ app.get('/api/admin/revenue/export', async (req, res) => {
   }
 });
 
-// Rota para listar todas as imagens (metadados)
-app.get('/api/galeria', async (req, res) => {
-  try {
-    const imagens = await Galeria.find({}, { 'imagem.dados': 0 }) // Exclui os dados binários da lista
-      .sort({ criadoEm: -1 });
-    res.json(imagens);
-  } catch (error) {
-    console.error('Erro ao listar imagens:', error);
-    res.status(500).json({ error: 'Erro ao carregar galeria' });
-  }
-});
-
-// Rota para upload de imagem
+// Upload de imagem com título
+// Rota: upload de imagem
 app.post('/api/galeria/upload', upload.single('imagem'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'Nenhuma imagem enviada' });
+      return res.status(400).json({ error: 'Nenhuma imagem foi enviada' });
     }
 
-    const novaImagem = new Galeria({
-      titulo: req.body.titulo || 'Sem título',
-      imagem: {
-        dados: req.file.buffer,
-        tipo: req.file.mimetype
-      }
-    });
+    const { titulo } = req.body;
+    if (!titulo) {
+      return res.status(400).json({ error: 'Título é obrigatório' });
+    }
 
+    const imagem = `/uploads/${req.file.filename}`;
+
+    const novaImagem = new Galeria({ titulo, imagem });
     await novaImagem.save();
 
-    res.json({ 
-      success: true,
-      id: novaImagem._id,
-      titulo: novaImagem.titulo,
-      criadoEm: novaImagem.criadoEm
+    res.status(201).json({ 
+      mensagem: 'Imagem salva com sucesso',
+      imagem: novaImagem
     });
-
-  } catch (error) {
-    console.error('Erro no upload:', error);
-    res.status(500).json({ error: 'Falha ao salvar imagem' });
+  } catch (err) {
+    console.error('Erro ao salvar imagem:', err);
+    res.status(500).json({ error: 'Erro ao salvar imagem' });
   }
 });
 
-// Rota para recuperar a imagem binária
-app.get('/api/galeria/imagem/:id', async (req, res) => {
+// Listar todas as imagens da galeria
+app.get('/api/galeria', async (req, res) => {
   try {
-    const imagem = await Galeria.findById(req.params.id).select('imagem');
-    
-    if (!imagem) {
-      return res.status(404).send('Imagem não encontrada');
-    }
-
-    res.set('Content-Type', imagem.imagem.tipo);
-    res.send(imagem.imagem.dados);
-
-  } catch (error) {
-    console.error('Erro ao recuperar imagem:', error);
-    res.status(500).send('Erro no servidor');
-  }
-});
-
-// Rota para busca
-// Rota para buscar imagens
-app.get('/api/galeria/busca', async (req, res) => {
-  try {
-    const { termo } = req.query;
-    
-    if (!termo || termo.trim() === '') {
-      return res.status(400).json({ error: 'Termo de busca é obrigatório' });
-    }
-
-    const imagens = await Galeria.find(
-      { titulo: { $regex: termo, $options: 'i' } },
-      { 'imagem.dados': 0 } // Exclui os dados binários
-    ).sort({ criadoEm: -1 });
-
+    const imagens = await Galeria.find({}).sort({ criadoEm: -1 });
     res.json(imagens);
-  } catch (error) {
-    console.error('Erro na busca:', error);
+  } catch (err) {
+    console.error('Erro ao buscar imagens:', err);
     res.status(500).json({ error: 'Erro ao buscar imagens' });
   }
 });
 
-// Rota para exclusão
+// Excluir uma imagem da galeria
 app.delete('/api/galeria/:id', async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ error: 'ID inválido' });
+    const imagem = await Galeria.findByIdAndDelete(req.params.id);
+
+    if (!imagem) {
+      return res.status(404).json({ error: 'Imagem não encontrada.' });
     }
 
-    const resultado = await Galeria.findByIdAndDelete(req.params.id);
-    
-    if (!resultado) {
-      return res.status(404).json({ error: 'Imagem não encontrada' });
+    // Apaga o arquivo fisicamente
+    const caminhoImagem = path.join(__dirname, 'public', imagem.imagem);
+    if (fs.existsSync(caminhoImagem)) {
+      fs.unlinkSync(caminhoImagem);
     }
 
-    res.json({ success: true, message: 'Imagem excluída com sucesso' });
+    res.json({ message: 'Imagem excluída com sucesso.' });
   } catch (error) {
     console.error('Erro ao excluir imagem:', error);
-    res.status(500).json({ error: 'Erro ao excluir imagem' });
+    res.status(500).json({ error: 'Erro ao excluir imagem.' });
   }
 });
-
 
 
 // Iniciar o servidor

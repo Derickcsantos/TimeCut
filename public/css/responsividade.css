@@ -2,7 +2,7 @@
     --sidebar-width: 280px;
     --sidebar-collapsed-width: 70px;
     --topbar-height: 60px;
-    --primary-color: #4e73df;
+    --primary-color: #bd7adcd8;
     --secondary-color: #f8f9fc;
     --text-color: #5a5c69;
     --light-gray: #dddfeb;
@@ -397,7 +397,7 @@
     --sidebar-width: 250px;
     --sidebar-collapsed-width: 70px;
     --topbar-height: 60px;
-    --primary-color: #4e73df;
+    --primary-color: #c04edf;
     --secondary-color: #f8f9fc;
     --text-color: #5a5c69;
     --light-gray: #dddfeb;
@@ -699,6 +699,11 @@
 
     .search-bar {
       margin: 0 0.5rem;
+    }
+
+    .search-bar-container,
+    .topbar-right{
+      display: none;
     }
   }
 

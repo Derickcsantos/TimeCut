@@ -3,9 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('appointmentForm');
   const steps = document.querySelectorAll('.step');
   const stepIndicators = document.querySelectorAll('.step-indicator');
-  const categorySelect = document.getElementById('category');
-  const serviceSelect = document.getElementById('service');
-  const employeeSelect = document.getElementById('employee');
   const appointmentDate = document.getElementById('appointmentDate');
   const timeSlotsContainer = document.getElementById('timeSlots');
   const selectedTimeInput = document.getElementById('selectedTime');
@@ -26,18 +23,26 @@ document.addEventListener('DOMContentLoaded', function() {
   const confirmDiscount = document.getElementById('confirmDiscount');
   
   // Variáveis para armazenar dados selecionados
+  let selectedCategory = null;
   let selectedService = null;
   let selectedEmployee = null;
   let selectedDate = null;
   let selectedTime = null;
   
-  // Inicializar Flatpickr para seleção de data
-  flatpickr(appointmentDate, {
-    locale: 'pt',
-    minDate: 'today',
-    dateFormat: 'd/m/Y',
-    
-  });
+  // Inicializar Flatpickr para seleção de data (se o elemento existir)
+  if (appointmentDate) {
+    flatpickr(appointmentDate, {
+      locale: 'pt',
+      minDate: 'today',
+      dateFormat: 'd/m/Y',
+      disable: [
+        function(date) {
+          // Desabilita todas as datas antes de 01/06/2025
+          return date < new Date(2025, 5, 1); // Mês é 0-based (5 = junho)
+        }
+      ]
+    });
+  }
   
   // Navegação entre passos
   function navigateToStep(stepNumber) {
@@ -45,7 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
     steps.forEach(step => step.classList.remove('active'));
     
     // Mostrar o passo atual
-    document.getElementById(`step${stepNumber}`).classList.add('active');
+    const currentStep = document.getElementById(`step${stepNumber}`);
+    if (currentStep) {
+      currentStep.classList.add('active');
+    }
     
     // Atualizar indicadores de passo
     stepIndicators.forEach(indicator => {
@@ -82,31 +90,31 @@ document.addEventListener('DOMContentLoaded', function() {
   function validateStep(stepNumber) {
     switch(stepNumber) {
       case 1:
-        if (!categorySelect.value) {
+        if (!selectedCategory) {
           alert('Por favor, selecione uma categoria');
           return false;
         }
         return true;
       case 2:
-        if (!serviceSelect.value) {
+        if (!selectedService) {
           alert('Por favor, selecione um serviço');
           return false;
         }
         return true;
       case 3:
-        if (!employeeSelect.value) {
+        if (!selectedEmployee) {
           alert('Por favor, selecione um profissional');
           return false;
         }
         return true;
       case 4:
-        if (!appointmentDate.value) {
+        if (!appointmentDate || !appointmentDate.value) {
           alert('Por favor, selecione uma data');
           return false;
         }
         return true;
       case 5:
-        if (!selectedTimeInput.value) {
+        if (!selectedTimeInput || !selectedTimeInput.value) {
           alert('Por favor, selecione um horário');
           return false;
         }
@@ -122,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Validar cupom
   async function validateCoupon(code, serviceId) {
     try {
-      console.log('Validando cupom:', code, 'para serviço:', serviceId); // Debug
+      console.log('Validando cupom:', code, 'para serviço:', serviceId);
       const response = await fetch(`/api/validate-coupon?code=${encodeURIComponent(code)}&serviceId=${serviceId}`);
       
       if (!response.ok) {
@@ -140,124 +148,184 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Aplicar cupom
-  applyCouponBtn.addEventListener('click', async function() {
-    console.log('Clicou em aplicar cupom');
-    console.log('Código digitado:', couponCode.value.trim());
-    console.log('Serviço selecionado:', selectedService);
-    const code = couponCode.value.trim();
-    if (!code) {
-      couponMessage.textContent = 'Digite um código de cupom';
-      couponMessage.className = 'text-small text-danger';
-      return;
-    }
+  // Aplicar cupom (se o botão existir)
+  if (applyCouponBtn) {
+    applyCouponBtn.addEventListener('click', async function() {
+      console.log('Clicou em aplicar cupom');
+      const code = couponCode ? couponCode.value.trim() : '';
+      if (!code) {
+        if (couponMessage) {
+          couponMessage.textContent = 'Digite um código de cupom';
+          couponMessage.className = 'text-small text-danger';
+        }
+        return;
+      }
 
-    if (!selectedService) {
-      couponMessage.textContent = 'Selecione um serviço primeiro';
-      couponMessage.className = 'text-small text-danger';
-      return;
-    }
+      if (!selectedService) {
+        if (couponMessage) {
+          couponMessage.textContent = 'Selecione um serviço primeiro';
+          couponMessage.className = 'text-small text-danger';
+        }
+        return;
+      }
 
-    const result = await validateCoupon(code, selectedService.id);
-    
-    if (result.valid) {
-      appliedCoupon = {
-        code: code,
-        discount: result.discount,
-        type: result.discountType,
-        message: result.message
-      };
+      const result = await validateCoupon(code, selectedService.id);
       
-      couponMessage.textContent = result.message || 'Cupom aplicado com sucesso!';
-      couponMessage.className = 'text-small text-success';
-      updateConfirmationData();
-    } else {
-      appliedCoupon = null;
-      couponMessage.textContent = result.message || 'Cupom inválido';
-      couponMessage.className = 'text-small text-danger';
-      updateConfirmationData();
-    }
-  });
-  
+      if (couponMessage) {
+        if (result.valid) {
+          appliedCoupon = {
+            code: code,
+            discount: result.discount,
+            type: result.discountType,
+            message: result.message
+          };
+          
+          couponMessage.textContent = result.message || 'Cupom aplicado com sucesso!';
+          couponMessage.className = 'text-small text-success';
+          updateConfirmationData();
+        } else {
+          appliedCoupon = null;
+          couponMessage.textContent = result.message || 'Cupom inválido';
+          couponMessage.className = 'text-small text-danger';
+          updateConfirmationData();
+        }
+      }
+    });
+  }
+
   // Carregar categorias do banco de dados
-async function loadCategories() {
-  try {
-    const response = await fetch('/api/categories');
-    if (!response.ok) throw new Error('Erro ao carregar categorias');
-    
-    const categories = await response.json();
-    
-    // Limpar e popular o select de categorias
-    categorySelect.innerHTML = '<option value="" selected disabled>Selecione uma categoria</option>';
-    
-    categories.forEach(category => {
-      const option = document.createElement('option');
-      option.value = category.id;
+  async function loadCategories() {
+    try {
+      const container = document.getElementById('categories-container');
+      if (!container) return;
       
-      // Criar conteúdo HTML com imagem e nome
-      option.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
+      container.innerHTML = '<div class="loading">Carregando categorias...</div>';
+      
+      const response = await fetch('/api/categories');
+      if (!response.ok) throw new Error('Erro ao carregar categorias');
+      
+      const categories = await response.json();
+      
+      if (categories.length === 0) {
+        container.innerHTML = '<div class="empty-message">Nenhuma categoria disponível</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      
+      categories.forEach(category => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.dataset.id = category.id;
+        
+        card.innerHTML = `
           ${category.imagem_category ? 
-            `<img src="${category.imagem_category}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">` : 
-            `<div style="width: 30px; height: 30px; border-radius: 50%; background: #eee;"></div>`
+            `<img src="${category.imagem_category}" alt="${category.name}">` : 
+            `<div style="width: 40px; height: 40px; border-radius: 50%; background: #eee;"></div>`
           }
-          <span>${category.name}</span>
-        </div>
-      `;
-      
-      categorySelect.appendChild(option);
-    });
-  } catch (error) {
-    console.error('Erro ao carregar categorias:', error);
-    console.log('Erro ao carregar categorias. Por favor, recarregue a página.');
-  }
-}
-  
-// Carregar serviços baseado na categoria selecionada
-async function loadServices(categoryId) {
-  try {
-    const response = await fetch(`/api/services/${categoryId}`);
-    if (!response.ok) throw new Error('Erro ao carregar serviços');
-    
-    const services = await response.json();
-    
-    // Limpar e popular o select de serviços
-    serviceSelect.innerHTML = '<option value="" selected disabled>Selecione um serviço</option>';
-    serviceSelect.disabled = false;
-    
-    services.forEach(service => {
-      const option = document.createElement('option');
-      option.value = service.id;
-      
-      // Adiciona a imagem, nome e preço formatado
-      option.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
-          ${service.imagem_service ? 
-            `<img src="${service.imagem_service}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">` : 
-            `<div style="width: 30px; height: 30px; border-radius: 50%; background: #eee;"></div>`
-          }
-          <div style="flex: 1;">
-            <div>${service.name}</div>
-            <small style="color: #666;">R$ ${service.price.toFixed(2)}</small>
+          <div class="item-info">
+            <h5>${category.name}</h5>
           </div>
-        </div>
-      `;
-      
-      // Armazena os dados para uso posterior
-      option.dataset.duration = service.duration;
-      option.dataset.price = service.price;
-      
-      serviceSelect.appendChild(option);
-    });
-  } catch (error) {
-    console.error('Erro ao carregar serviços:', error);
-    console.log('Erro ao carregar serviços. Por favor, tente novamente.');
+        `;
+        
+        card.addEventListener('click', function() {
+          document.querySelectorAll('#categories-container .item-card').forEach(el => {
+            el.classList.remove('selected');
+          });
+          
+          this.classList.add('selected');
+          selectedCategory = {
+            id: category.id,
+            name: category.name,
+            image: category.imagem_category
+          };
+          
+          loadServices(category.id);
+        });
+        
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error('Erro ao carregar categorias:', error);
+      const container = document.getElementById('categories-container');
+      if (container) {
+        container.innerHTML = '<div class="empty-message">Erro ao carregar categorias. Recarregue a página.</div>';
+      }
+    }
   }
-}
-  
-// Carregar funcionários baseado no serviço selecionado
+
+  // Carregar serviços baseado na categoria selecionada
+  async function loadServices(categoryId) {
+    try {
+      const container = document.getElementById('services-container');
+      if (!container) return;
+      
+      container.innerHTML = '<div class="loading">Carregando serviços...</div>';
+      
+      const response = await fetch(`/api/services/${categoryId}`);
+      if (!response.ok) throw new Error('Erro ao carregar serviços');
+      
+      const services = await response.json();
+      
+      if (services.length === 0) {
+        container.innerHTML = '<div class="empty-message">Nenhum serviço disponível para esta categoria</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      
+      services.forEach(service => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.dataset.id = service.id;
+        
+        card.innerHTML = `
+          ${service.imagem_service ? 
+            `<img src="${service.imagem_service}" alt="${service.name}">` : 
+            `<div style="width: 40px; height: 40px; border-radius: 50%; background: #eee;"></div>`
+          }
+          <div class="item-info">
+            <h5>${service.name}</h5>
+            <p>R$ ${service.price.toFixed(2)} • ${service.duration} min</p>
+          </div>
+        `;
+        
+        card.addEventListener('click', function() {
+          document.querySelectorAll('#services-container .item-card').forEach(el => {
+            el.classList.remove('selected');
+          });
+          
+          this.classList.add('selected');
+          selectedService = {
+            id: service.id,
+            name: service.name,
+            price: service.price,
+            duration: service.duration,
+            image: service.imagem_service
+          };
+          
+          loadEmployees(service.id);
+        });
+        
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error('Erro ao carregar serviços:', error);
+      const container = document.getElementById('services-container');
+      if (container) {
+        container.innerHTML = '<div class="empty-message">Erro ao carregar serviços. Tente novamente.</div>';
+      }
+    }
+  }
+
+  // Carregar funcionários baseado no serviço selecionado
 async function loadEmployees(serviceId) {
   try {
+    const container = document.getElementById('employees-container');
+    if (!container) return;
+    
+    container.innerHTML = '<div class="loading">Carregando profissionais...</div>';
+    
     const response = await fetch(`/api/employees/${serviceId}`);
     if (!response.ok) throw new Error('Erro ao carregar profissionais');
     
@@ -266,31 +334,56 @@ async function loadEmployees(serviceId) {
     // Filtrar apenas funcionários ativos
     const activeEmployees = allEmployees.filter(employee => employee.is_active === true);
     
-    // Limpar e popular o select de funcionários
-    employeeSelect.innerHTML = '<option value="" selected disabled>Selecione um profissional</option>';
-    
     if (activeEmployees.length === 0) {
-      employeeSelect.innerHTML = '<option value="" selected disabled>Nenhum profissional disponível</option>';
+      container.innerHTML = '<div class="empty-message">Nenhum profissional disponível para este serviço</div>';
       return;
     }
     
-    activeEmployees.forEach(employee => {
-      const option = document.createElement('option');
-      option.value = employee.id;
-      option.textContent = employee.name;
-      employeeSelect.appendChild(option);
-    });
+    container.innerHTML = '';
     
+    activeEmployees.forEach(employee => {
+      const card = document.createElement('div');
+      card.className = 'item-card';
+      card.dataset.id = employee.id;
+      
+      card.innerHTML = `
+        ${employee.imagem_funcionario ? 
+          `<img src="${employee.imagem_funcionario}" alt="${employee.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/40'">` : 
+          `<div style="width: 40px; height: 40px; border-radius: 50%; background: #eee;"></div>`
+        }
+        <div class="item-info">
+          <h5>${employee.name}</h5>
+      `;
+      
+      card.addEventListener('click', function() {
+        document.querySelectorAll('#employees-container .item-card').forEach(el => {
+          el.classList.remove('selected');
+        });
+        
+        this.classList.add('selected');
+        selectedEmployee = {
+          id: employee.id,
+          name: employee.name,
+          photo: employee.imagem_funcionario,
+        };
+      });
+      
+      container.appendChild(card);
+    });
   } catch (error) {
     console.error('Erro ao carregar profissionais:', error);
-    employeeSelect.innerHTML = '<option value="" selected disabled>Erro ao carregar profissionais</option>';
-    console.log('Erro ao carregar profissionais. Por favor, tente novamente.');
+    const container = document.getElementById('employees-container');
+    if (container) {
+      container.innerHTML = '<div class="empty-message">Erro ao carregar profissionais. Tente novamente.</div>';
+    }
   }
 }
   
   // Carregar horários disponíveis
   async function loadAvailableTimes(employeeId, date, duration) {
     try {
+      if (!timeSlotsContainer) return;
+      
       const response = await fetch(`/api/available-times?employeeId=${employeeId}&date=${date}&duration=${duration}`);
       if (!response.ok) throw new Error('Erro ao carregar horários disponíveis');
       
@@ -298,7 +391,9 @@ async function loadEmployees(serviceId) {
       
       // Limpar e popular os horários disponíveis
       timeSlotsContainer.innerHTML = '';
-      selectedTimeInput.value = '';
+      if (selectedTimeInput) {
+        selectedTimeInput.value = '';
+      }
       
       if (timeSlots.length === 0) {
         timeSlotsContainer.innerHTML = '<p>Nenhum horário disponível para esta data</p>';
@@ -313,12 +408,12 @@ async function loadEmployees(serviceId) {
         slotElement.dataset.end = slot.end;
         
         slotElement.addEventListener('click', function() {
-          // Remover seleção de todos os slots
           document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
           
-          // Selecionar este slot
           this.classList.add('selected');
-          selectedTimeInput.value = `${this.dataset.start}-${this.dataset.end}`;
+          if (selectedTimeInput) {
+            selectedTimeInput.value = `${this.dataset.start}-${this.dataset.end}`;
+          }
           selectedTime = {
             start: this.dataset.start,
             end: this.dataset.end
@@ -329,22 +424,34 @@ async function loadEmployees(serviceId) {
       });
     } catch (error) {
       console.error('Erro ao carregar horários disponíveis:', error);
-      console.log('Erro ao carregar horários disponíveis. Por favor, tente novamente.');
+      if (timeSlotsContainer) {
+        timeSlotsContainer.innerHTML = '<p>Erro ao carregar horários disponíveis. Por favor, tente novamente.</p>';
+      }
     }
   }
 
   // Atualizar dados de confirmação
   function updateConfirmationData() {
-    const serviceOption = serviceSelect.options[serviceSelect.selectedIndex];
-    const serviceText = serviceOption.text;
+    if (!selectedService) return;
     
-    confirmEmployee.textContent = employeeSelect.options[employeeSelect.selectedIndex].text;
-    confirmDate.textContent = appointmentDate.value;
-    confirmTime.textContent = selectedTime ? `${selectedTime.start} - ${selectedTime.end}` : '';
-    confirmService.textContent = serviceText;
+    if (confirmService) {
+      confirmService.textContent = selectedService.name;
+    }
+    
+    if (confirmEmployee && selectedEmployee) {
+      confirmEmployee.textContent = selectedEmployee.name;
+    }
+    
+    if (confirmDate && appointmentDate) {
+      confirmDate.textContent = appointmentDate.value;
+    }
+    
+    if (confirmTime && selectedTime) {
+      confirmTime.textContent = `${selectedTime.start} - ${selectedTime.end}`;
+    }
     
     // Preços e descontos
-    originalPrice = parseFloat(serviceOption.dataset.price);
+    originalPrice = selectedService.price;
     let finalPrice = originalPrice;
     let discountText = '';
     
@@ -354,7 +461,7 @@ async function loadEmployees(serviceId) {
       } else {
         finalPrice = originalPrice - appliedCoupon.discount;
       }
-      finalPrice = Math.max(0, finalPrice); // Garante que não fique negativo
+      finalPrice = Math.max(0, finalPrice);
       discountText = ` (${appliedCoupon.discount}${appliedCoupon.type === 'percentage' ? '%' : 'R$'} de desconto)`;
     }
     
@@ -373,50 +480,18 @@ async function loadEmployees(serviceId) {
     }
   }
   
-  // Event listeners para selects
-  categorySelect.addEventListener('change', function() {
-    if (this.value) {
-      loadServices(this.value);
-    } else {
-      serviceSelect.innerHTML = '<option value="" selected disabled>Primeiro selecione uma categoria</option>';
-      serviceSelect.disabled = true;
-    }
-  });
-  
-  serviceSelect.addEventListener('change', function() {
-    if (this.value) {
-      const selectedOption = this.options[this.selectedIndex];
-      selectedService = {
-        id: this.value,
-        name: selectedOption.text.split(' - ')[0], // Remove o preço do nome
-        duration: selectedOption.dataset.duration,
-        price: selectedOption.dataset.price ? parseFloat(selectedOption.dataset.price) : 0
-      };
-      loadEmployees(this.value);
-    } else {
-      employeeSelect.innerHTML = '<option value="" selected disabled>Primeiro selecione um serviço</option>';
-    }
-  });
-  
-  employeeSelect.addEventListener('change', function() {
-    if (this.value) {
-      selectedEmployee = {
-        id: this.value,
-        name: this.options[this.selectedIndex].text
-      };
-    }
-  });
-  
-  appointmentDate.addEventListener('change', function() {
-    if (this.value && selectedService && selectedEmployee) {
-      // Converter data para formato YYYY-MM-DD
-      const [day, month, year] = this.value.split('/');
-      const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      
-      selectedDate = formattedDate;
-      loadAvailableTimes(selectedEmployee.id, formattedDate, selectedService.duration);
-    }
-  });
+  // Event listener para data (se o elemento existir)
+  if (appointmentDate) {
+    appointmentDate.addEventListener('change', function() {
+      if (this.value && selectedService && selectedEmployee) {
+        const [day, month, year] = this.value.split('/');
+        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        
+        selectedDate = formattedDate;
+        loadAvailableTimes(selectedEmployee.id, formattedDate, selectedService.duration);
+      }
+    });
+  }
   
   // Envio do formulário
   form.addEventListener('submit', async function(e) {

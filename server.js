@@ -39,7 +39,7 @@ const corsOptions = {
   credentials: true,        // Permite cookies (importante se for necessário)
 };
 
-const mongoURI = process.env.MONGO_URI || 'mongodb+srv://derickcampos:Dede%4002%40@cluster0.zw6awrd.mongodb.net/galeria?retryWrites=true&w=majority'
+const mongoURI = process.env.MONGO_URI 
 
 
 // Conexão com MongoDB
